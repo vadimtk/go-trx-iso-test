@@ -76,7 +76,17 @@ var (
 		if frombalance>0 {
 			moveamt := rand.Intn(frombalance)
 			_, err = tx.Exec("update accounts set balance="+strconv.Itoa(tobalance+moveamt)+" where id="+strconv.Itoa(toAccnt))
+				     if err != nil {
+					if MySQLErrorCode(err)==1213 { tx.Rollback(); continue; }
+					
+					     panic(err.Error())
+				     }
 			_, err = tx.Exec("update accounts set balance="+strconv.Itoa(frombalance-moveamt)+" where id="+strconv.Itoa(fromAccnt))
+				     if err != nil {
+					if MySQLErrorCode(err)==1213 { tx.Rollback(); continue; }
+					
+					     panic(err.Error())
+				     }
 			fmt.Printf("Moving %d from %d to %d: from bal:%d to bal:%d\n", moveamt, fromAccnt, toAccnt, frombalance, tobalance)
 			
 		}
